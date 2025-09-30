@@ -10,8 +10,8 @@ build/
 # Icon generation artifacts (can be regenerated)
 build-icons/
 
-# Keep dist/ folder - contains distributable files for users
-# dist/ - commented out to keep distribution files
+# Distribution files (use GitHub Releases instead)
+dist/
 
 # Environment variables
 .env
