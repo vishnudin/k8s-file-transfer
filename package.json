@@ -34,7 +34,7 @@
     "electron",
     "developer-tools"
   ],
-  "author": "Vishnu Dinesh <vishnudin@example.com>",
+  "author": "Dinesh Perumal <2contactdinesh@gmail.com>",
   "keywords": ["kubernetes", "file-transfer", "electron", "desktop", "kubectl", "k8s"],
   "license": "MIT",
   "dependencies": {
@@ -92,7 +92,7 @@
           "arch": ["x64", "arm64"]
         }
       ],
-      "icon": "public/app-icon.svg"
+      "icon": "public/app-icon.png"
     },
     "linux": {
       "target": [
