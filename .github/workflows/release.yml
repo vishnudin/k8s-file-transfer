@@ -1,0 +1,153 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-and-release:
+    runs-on: macos-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm install --legacy-peer-deps
+      
+    - name: Build application
+      run: npm run dist
+      
+    - name: Calculate checksums
+      id: checksums
+      run: |
+        INTEL_SHA256=$(shasum -a 256 "dist/Kubernetes File Transfer-${GITHUB_REF#refs/tags/v}-mac.zip" | cut -d' ' -f1)
+        ARM64_SHA256=$(shasum -a 256 "dist/Kubernetes File Transfer-${GITHUB_REF#refs/tags/v}-arm64-mac.zip" | cut -d' ' -f1)
+        echo "intel_sha256=$INTEL_SHA256" >> $GITHUB_OUTPUT
+        echo "arm64_sha256=$ARM64_SHA256" >> $GITHUB_OUTPUT
+        
+    - name: Create release notes
+      run: |
+        cat > release_notes.md << EOF
+        # K8s File Transfer ${GITHUB_REF#refs/tags/}
+        
+        ## 🎉 Features
+        - **Intuitive GUI**: Clean, modern interface built with Material-UI
+        - **Bidirectional Transfer**: Upload files to pods or download files from pods
+        - **Kubernetes Integration**: Automatically detects kubectl contexts, namespaces, and pods
+        - **Multi-Container Support**: Automatically handles pods with multiple containers
+        - **Transfer History**: Keep track of all your file transfers with detailed logs
+        - **Progress Tracking**: Real-time progress indicators for file transfers
+        - **Error Handling**: Comprehensive error reporting and user feedback
+        - **Cross-Platform**: Works on macOS (Intel and Apple Silicon)
+        
+        ## 📦 Installation
+        
+        ### Via Homebrew (Recommended)
+        \`\`\`bash
+        # Add the tap
+        brew tap ${{ github.repository_owner }}/k8s-tools
+        
+        # Install the application
+        brew install k8s-file-transfer
+        
+        # Launch
+        k8s-file-transfer
+        \`\`\`
+        
+        ### Manual Installation
+        1. Download the appropriate file for your Mac:
+           - **Intel Macs**: \`Kubernetes File Transfer-${GITHUB_REF#refs/tags/v}.dmg\`
+           - **Apple Silicon Macs**: \`Kubernetes File Transfer-${GITHUB_REF#refs/tags/v}-arm64.dmg\`
+        2. Open the DMG file
+        3. Drag the application to your Applications folder
+        
+        ## 🔐 Verification
+        Verify the download integrity using SHA256 checksums:
+        \`\`\`
+        # Intel
+        shasum -a 256 "Kubernetes File Transfer-${GITHUB_REF#refs/tags/v}-mac.zip"
+        # Should match: ${{ steps.checksums.outputs.intel_sha256 }}
+        
+        # Apple Silicon  
+        shasum -a 256 "Kubernetes File Transfer-${GITHUB_REF#refs/tags/v}-arm64-mac.zip"
+        # Should match: ${{ steps.checksums.outputs.arm64_sha256 }}
+        \`\`\`
+        
+        ## 🔧 Prerequisites
+        - macOS Big Sur (11.0) or later
+        - kubectl installed and configured
+        - Access to Kubernetes clusters
+        EOF
+        
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        body_path: release_notes.md
+        files: |
+          dist/Kubernetes File Transfer-*.dmg
+          dist/Kubernetes File Transfer-*.zip
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Generate Homebrew formula
+      run: |
+        mkdir -p homebrew-formula
+        cat > homebrew-formula/k8s-file-transfer.rb << EOF
+        class K8sFileTransfer < Formula
+          desc "GUI application for transferring files between local machine and Kubernetes pods"
+          homepage "https://github.com/${{ github.repository }}"
+          version "${GITHUB_REF#refs/tags/v}"
+          license "MIT"
+        
+          on_macos do
+            if Hardware::CPU.intel?
+              url "https://github.com/${{ github.repository }}/releases/download/${GITHUB_REF#refs/tags/}/Kubernetes.File.Transfer-${GITHUB_REF#refs/tags/v}-mac.zip"
+              sha256 "${{ steps.checksums.outputs.intel_sha256 }}"
+            else
+              url "https://github.com/${{ github.repository }}/releases/download/${GITHUB_REF#refs/tags/}/Kubernetes.File.Transfer-${GITHUB_REF#refs/tags/v}-arm64-mac.zip"
+              sha256 "${{ steps.checksums.outputs.arm64_sha256 }}"
+            end
+          end
+        
+          depends_on "kubectl"
+          depends_on macos: ">= :big_sur"
+        
+          def install
+            prefix.install "Kubernetes File Transfer.app"
+            bin.write_exec_script "#{prefix}/Kubernetes File Transfer.app/Contents/MacOS/Kubernetes File Transfer"
+          end
+        
+          def caveats
+            <<~EOS
+              To use k8s-file-transfer, you need:
+              1. kubectl installed and configured with access to your Kubernetes clusters
+              2. Proper permissions to list pods and execute kubectl cp commands
+        
+              Launch the application from Applications folder or run:
+                k8s-file-transfer
+        
+              For more information, visit: https://github.com/${{ github.repository }}
+            EOS
+          end
+        
+          test do
+            assert_predicate prefix/"Kubernetes File Transfer.app", :exist?
+          end
+        end
+        EOF
+        
+    - name: Upload Homebrew formula as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: homebrew-formula
+        path: homebrew-formula/k8s-file-transfer.rb

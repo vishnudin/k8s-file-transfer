@@ -1,0 +1,100 @@
+.App {
+  text-align: center;
+}
+
+.transfer-icon {
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+
+.transfer-icon:hover {
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+  transition: filter 0.3s ease;
+}
+
+.App-header {
+  background-color: #282c34;
+  padding: 20px;
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+/* Custom styles for file transfer */
+.file-drop-zone {
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  transition: border-color 0.3s ease;
+  cursor: pointer;
+}
+
+.file-drop-zone:hover {
+  border-color: #1976d2;
+}
+
+.file-drop-zone.drag-over {
+  border-color: #1976d2;
+  background-color: #f5f5f5;
+}
+
+.transfer-progress {
+  margin-top: 16px;
+}
+
+.history-item {
+  border-left: 4px solid #1976d2;
+  padding-left: 12px;
+  margin-bottom: 8px;
+}
+
+.history-item.success {
+  border-left-color: #4caf50;
+}
+
+.history-item.error {
+  border-left-color: #f44336;
+}
+
+.kubernetes-config {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.file-browser {
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+}
+
+.file-item {
+  padding: 8px 12px;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.file-item:hover {
+  background-color: #f5f5f5;
+}
+
+.file-item.selected {
+  background-color: #e3f2fd;
+}
+
+.transfer-direction {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 16px 0;
+}
+
+.transfer-arrow {
+  font-size: 24px;
+  margin: 0 16px;
+  color: #1976d2;
+}

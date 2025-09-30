@@ -1,0 +1,140 @@
+{
+  "name": "k8s-file-transfer",
+  "version": "1.0.0",
+  "description": "A desktop application for transferring files between your local machine and Kubernetes pods",
+  "main": "build/electron.js",
+  "homepage": "https://github.com/vishnudin/k8s-file-transfer",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vishnudin/k8s-file-transfer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/vishnudin/k8s-file-transfer/issues"
+  },
+  "scripts": {
+    "start": "npm run build-dev && electron .",
+    "start-debug": "npm run build-dev && OPEN_DEVTOOLS=true NODE_ENV=development electron .",
+    "start-dev": "concurrently \"npm run react-start\" \"wait-on http://localhost:3000 && npm run electron-dev\"",
+    "react-start": "react-scripts start",
+    "electron": "electron .",
+    "electron-dev": "NODE_ENV=development OPEN_DEVTOOLS=true electron .",
+    "build-dev": "npm run react-build && npm run copy-electron && npm run copy-icons",
+    "copy-icons": "cp public/app-icon.svg build/icon.svg && cp public/transfer-icon.svg build/",
+    "quick-start": "electron .",
+    "build": "npm run react-build && npm run copy-electron && npm run electron-build",
+    "react-build": "react-scripts build",
+    "copy-electron": "cp public/electron.js build/ && cp public/preload.js build/",
+    "electron-build": "electron-builder",
+    "dist": "npm run build && electron-builder --publish=never",
+    "test": "react-scripts test"
+  },
+  "keywords": [
+    "kubernetes",
+    "file-transfer",
+    "electron",
+    "developer-tools"
+  ],
+  "author": "Vishnu Dinesh <vishnudin@example.com>",
+  "keywords": ["kubernetes", "file-transfer", "electron", "desktop", "kubectl", "k8s"],
+  "license": "MIT",
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^7.3.2",
+    "@mui/material": "^7.3.2",
+    "@mui/x-tree-view": "^8.12.0",
+    "electron-is-dev": "^3.0.1",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.5.2",
+    "@types/react": "^19.1.13",
+    "@types/react-dom": "^19.1.9",
+    "chokidar": "^4.0.3",
+    "concurrently": "^9.2.1",
+    "electron": "^38.1.2",
+    "electron-builder": "^26.0.12",
+    "react-scripts": "^5.0.1",
+    "typescript": "^5.9.2",
+    "wait-on": "^9.0.1"
+  },
+  "build": {
+    "appId": "com.developer.k8s-file-transfer",
+    "productName": "Kubernetes File Transfer",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "build/**/*",
+      "node_modules/**/*",
+      "!node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
+      "!node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
+      "!node_modules/*.d.ts",
+      "!node_modules/.bin",
+      "!**/*.{iml,o,hprof,orig,pyc,pyo,rbc,swp,csproj,sln,xproj}",
+      "!.editorconfig",
+      "!**/._*",
+      "!**/{.DS_Store,.git,.hg,.svn,CVS,RCS,SCCS,.gitignore,.gitattributes}",
+      "!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output}",
+      "!**/{appveyor.yml,.travis.yml,circle.yml}",
+      "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}"
+    ],
+    "mac": {
+      "category": "public.app-category.developer-tools",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["x64", "arm64"]
+        },
+        {
+          "target": "zip",
+          "arch": ["x64", "arm64"]
+        }
+      ],
+      "icon": "public/app-icon.svg"
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": ["x64", "arm64"]
+        },
+        {
+          "target": "tar.gz",
+          "arch": ["x64", "arm64"]
+        }
+      ],
+      "category": "Development"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64", "arm64"]
+        },
+        {
+          "target": "zip",
+          "arch": ["x64", "arm64"]
+        }
+      ]
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "your-username",
+      "repo": "k8s-file-transfer"
+    }
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
