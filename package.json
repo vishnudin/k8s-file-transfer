@@ -1,9 +1,9 @@
 {
   "name": "k8s-file-transfer",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A desktop application for transferring files between your local machine and Kubernetes pods",
   "main": "build/electron.js",
-  "homepage": "https://github.com/vishnudin/k8s-file-transfer",
+  "homepage": "./",
   "repository": {
     "type": "git",
     "url": "https://github.com/vishnudin/k8s-file-transfer.git"
